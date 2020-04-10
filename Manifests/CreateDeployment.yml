@@ -1,16 +1,8 @@
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: nsclicker
-
----  
-
 apiVersion: apps/v1
 kind: Deployment
 metadata:
 # This is the name of my deployment
   name: dotnetcoreapp-deployment
-  namespace: nsclicker
 spec:
   replicas: 3
   strategy: 
@@ -26,30 +18,14 @@ spec:
       labels:
     # This is the label name for all the pods defined in this deployment
         app: dotnetcoreapp-podlabel
+        gatekeeper: bobo
     spec:
       containers:
       - name: dotnetcoreapp-container
-        image: acrhackfestjim11437.azurecr.io/dotnetcoreapp:v1        
+        image: acrhackfestjim11437.azurecr.io/dotnetcoreapp:v2        
         resources:
           limits:
             memory: "128Mi"
             cpu: "500m"
         ports:
         - containerPort: 80
-
----
-
-apiVersion: v1
-kind: Service
-metadata:
-  name: dotnetcoreapp-service
-  namespace: nsclicker
-spec:
-  selector:
-    app: dotnetcoreapp-podlabel
-  ports:
-  - port: 8080
-    targetPort: 80
-  type: LoadBalancer
-  
-

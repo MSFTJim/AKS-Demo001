@@ -1,0 +1,55 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: nsGate1
+
+---  
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+# This is the name of my deployment
+  name: dotnetcoreapp-deployment
+  namespace: nsGate1
+spec:
+  replicas: 3
+  strategy: 
+    type: Recreate
+  selector:
+    matchLabels:
+    # Not really sure why this step is needed.  Maybe its to support more than 1 pod template in a deployment?
+    # Anyway, this tells the deployment which pod template to deploy 
+        app: dotnetcoreapp-podlabel  
+  template:
+# This is a Pod Template... a template describing the Pods
+    metadata:
+      labels:
+    # This is the label name for all the pods defined in this deployment
+        app: dotnetcoreapp-podlabel
+    spec:
+      containers:
+      - name: dotnetcoreapp-container
+        image: acrhackfestjim11437.azurecr.io/dotnetcoreapp:v2        
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 80
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: dotnetcoreapp-service
+  namespace: nsGate1
+spec:
+  selector:
+    app: dotnetcoreapp-podlabel
+  ports:
+  - port: 8080
+    targetPort: 80
+  type: LoadBalancer
+  
+
